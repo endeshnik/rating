@@ -1,1 +1,1 @@
-# rating
+# teacher_rating
