@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список вчителів</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Список вчителів</h1>
+        
+        <% if (error) { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+        
+        <!-- Додаємо кнопку для адміністраторів -->
+        <% if (user && user.isAdmin) { %>
+            <div class="admin-actions">
+                <a href="/admin/teachers/add" class="btn admin-btn">Додати нового вчителя</a>
+                <a href="/admin/teachers" class="btn admin-btn">Керувати вчителями</a>
+            </div>
+        <% } %>
+        
+        <div class="teachers-grid">
+            <% if (teachers.length === 0) { %>
+                <p>Немає доступних вчителів.</p>
+            <% } else { %>
+                <% teachers.forEach(function(teacher) { %>
+                    <div class="teacher-card">
+                        <div class="teacher-info">
+                            <h3><%= teacher.full_name %></h3>
+                            <p class="subject"><%= teacher.subject %></p>
+                            <div class="rating-info">
+                                <span class="avg-rating">
+                                    <% const avgRating = parseFloat(teacher.avgRating).toFixed(1) %>
+                                    <%= avgRating %>/10
+                                </span>
+                                <span class="rating-count">(<%= teacher.ratingCount %> відгуків)</span>
+                            </div>
+                            <% if (teacher.description) { %>
+                                <p class="description"><%= teacher.description %></p>
+                            <% } %>
+                            <div class="teacher-actions">
+                                <a href="/teachers/<%= teacher.id %>" class="btn">Переглянути профіль</a>
+                                <a href="/rate/<%= teacher.id %>" class="btn">Оцінити</a>
+                            </div>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } %>
+        </div>
+        
+        <div class="navigation">
+            <a href="/dashboard" class="btn">Мій профіль</a>
+            <% if (user && user.isAdmin) { %>
+                <a href="/admin" class="btn admin-btn">Адмін-панель</a>
+            <% } %>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+</body>
+</html>

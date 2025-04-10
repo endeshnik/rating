@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оцінити вчителя</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Оцінити вчителя</h1>
+        
+        <% if (error) { %>
+            <div class="error"><%= error %></div>
+        <% } %>
+            <div class="rating-container">
+            <form action="select-teacher" method="POST" class="teacher-select-form">
+                <div class="form-group">
+                    <label for="teacherId">Виберіть вчителя:</label>
+                    <select id="teacherId" name="teacherId" class="teacher-dropdown" onchange="this.form.submit()">
+                        <option value="" <%= !selectedTeacher ? 'selected' : '' %>>-- Виберіть вчителя --</option>
+                        <% teachers.forEach(function(t) { %>
+                            <option value="<%= t.id %>" <%= (selectedTeacher && selectedTeacher.id == t.id) ? 'selected' : '' %>><%= t.full_name %> (<%= t.subject %>)</option>
+                        <% }); %>
+                    </select>
+                </div>
+            </form>
+            
+            <% if (selectedTeacher) { %>
+                <div class="teacher-info">
+                    <h3><%= selectedTeacher.full_name %></h3>
+                    <p>Предмет: <%= selectedTeacher.subject %></p>
+                </div>
+                
+                <form action="/submit-rating" method="POST" class="rating-form">
+                    <input type="hidden" name="teacherId" value="<%= selectedTeacher.id %>">
+                    
+                    <div class="form-group">
+                        <label>Рейтинг:</label>
+                        <div class="star-rating">
+                            <input type="number" id="rating" name="rating" min="1" max="10" value="<%= existingRating ? existingRating.rating : '' %>" required>
+                            <span class="rating-range">/ 10</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="comment">Коментар:</label>
+                        <textarea id="comment" name="comment" rows="4" placeholder="Напишіть ваш відгук..."><%= existingRating ? existingRating.comment : '' %></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn"><%= existingRating ? 'Оновити оцінку' : 'Відправити оцінку' %></button>
+                </form>
+            <% } else { %>
+                <div class="select-teacher-prompt">
+                    <p>Будь ласка, виберіть вчителя зі списку вище для оцінювання.</p>
+                </div>
+            <% } %>
+        </div>
+        
+        <div class="navigation">
+            <a href="/dashboard" class="btn">Мій профіль</a>
+            <a href="/teachers" class="btn">Всі вчителі</a>
+            <% if (user && user.isAdmin) { %>
+                <a href="/admin" class="btn admin-btn">Адмін-панель</a>
+            <% } %>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+</body>
+</html>

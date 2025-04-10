@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профіль вчителя</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Профіль вчителя</h1>
+        
+        <div class="teacher-profile">
+            <div class="teacher-header">
+                <h2><%= teacher.full_name %></h2>
+                <p class="subject"><%= teacher.subject %></p>
+                <div class="avg-rating">
+                    <span>Середній рейтинг: <%= avgRating %> / 5</span>
+                </div>
+            </div>
+            
+            <% if (teacher.description) { %>
+                <div class="teacher-description">
+                    <h3>Про вчителя</h3>
+                    <p><%= teacher.description %></p>
+                </div>
+            <% } %>
+            
+            <div class="teacher-actions">
+                <% if (!hasRated) { %>
+                    <a href="/rate/<%= teacher.id %>" class="btn">Оцінити вчителя</a>
+                <% } else { %>
+                    <p>Ви вже оцінили цього вчителя.</p>
+                    <a href="/rate/<%= teacher.id %>" class="btn">Змінити оцінку</a>
+                <% } %>
+                
+                <div class="comment-form">
+                    <h3>Додати коментар</h3>
+                    <form action="/submit-comment/<%= teacher.id %>" method="POST">
+                        <div class="form-group">
+                            <label for="comment">Ваш коментар:</label>
+                            <textarea id="comment" name="comment" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn">Відправити коментар</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="ratings-section">
+                <h3>Відгуки (<%= ratings.length %>)</h3>
+                
+                <% if (ratings.length === 0) { %>
+                    <p>Немає відгуків для цього вчителя.</p>
+                <% } else { %>
+                    <div class="ratings-list">
+                        <% ratings.forEach(function(rating) { %>
+                            <div class="rating-item">
+                                <div class="rating-header">
+                                    <span class="rating-value">Оцінка: <%= rating.rating %>/10</span>
+                                    <% if (user && user.isAdmin) { %>
+                                        <span class="rating-author">від <%= rating.username %></span>
+                                    <% } %>
+                                    <span class="rating-date"><%= new Date(rating.created_at).toLocaleDateString() %></span>
+                                </div>
+                                <div class="rating-comment">
+                                    <% if (rating.comment) { %>
+                                        <%= rating.comment %>
+                                    <% } else { %>
+                                        <em>Без коментаря</em>
+                                    <% } %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="/teachers" class="btn">Назад до списку</a>
+            <a href="/dashboard" class="btn">Мій профіль</a>
+            <% if (user && user.isAdmin) { %>
+                <a href="/admin" class="btn admin-btn">Адмін-панель</a>
+            <% } %>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+</body>
+</html>

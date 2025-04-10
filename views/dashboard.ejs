@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Особистий кабінет</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Особистий кабінет</h1>
+        <div class="welcome">
+            <h2>Вітаємо, <%= user.username %>!</h2>
+            <p>Ви успішно увійшли в систему.</p>
+        </div>
+        <!-- Replace the navigation section -->
+        <div class="navigation">
+            <a href="/teachers" class="btn btn-rate">Оцінювати</a>
+            <a href="/chat" class="btn">Чат</a>
+            <!-- Add this after the regular navigation -->
+            <% if (user && user.isAdmin) { %>
+                <div class="admin-navigation">
+                    <h3>Адмін-навігація</h3>
+                    <div class="admin-nav-buttons">
+                        <a href="/dashboard" class="admin-nav-btn <%= currentPage === 'dashboard' ? 'active' : '' %>">Головна</a>
+                        <a href="/admin" class="admin-nav-btn <%= currentPage === 'admin' ? 'active' : '' %>">Адмін-панель</a>
+                        <a href="/users-cards" class="admin-nav-btn <%= currentPage === 'users-cards' ? 'active' : '' %>">Картки користувачів</a>
+                        <a href="/teachers" class="admin-nav-btn <%= currentPage === 'teachers' ? 'active' : '' %>">Оцінювання</a>
+                        <a href="/manage-users" class="admin-nav-btn <%= currentPage === 'manage-users' ? 'active' : '' %>">Керування користувачами</a>
+                    </div>
+                </div>
+            <% } %>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+</body>
+</html>

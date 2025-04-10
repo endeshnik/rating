@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Керування студентами</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Керування студентами</h1>
+        
+        <div class="admin-panel">
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            
+            <div class="users-list">
+                <% if (students.length === 0) { %>
+                    <p>Немає студентів у системі.</p>
+                <% } else { %>
+                    <% students.forEach(function(student) { %>
+                        <div class="user-row">
+                            <div class="user-info">
+                                <strong><%= student.username %></strong>
+                                <% if (student.full_name) { %>
+                                    (<%= student.full_name %>)
+                                <% } %>
+                                <% if (student.class) { %>
+                                    - Клас: <%= student.class %>
+                                <% } %>
+                                <% if (student.is_admin === 1) { %>
+                                    <span class="admin-badge">Адмін</span>
+                                <% } %>
+                            </div>
+                            <div class="user-actions">
+                                <% if (student.id != user.id) { %>
+                                    <a href="/admin/students/toggle-admin/<%= student.id %>" class="btn btn-small admin-btn">
+                                        <%= student.is_admin === 1 ? 'Забрати права адміна' : 'Зробити адміном' %>
+                                    </a>
+                                    <a href="/admin/students/delete/<%= student.id %>" class="btn btn-small delete-btn" 
+                                       onclick="return confirm('Ви впевнені, що хочете видалити цього користувача?')">
+                                        Видалити
+                                    </a>
+                                <% } else { %>
+                                    <span>Поточний користувач</span>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="/admin" class="btn">Повернутися до панелі адміністратора</a>
+            <a href="/dashboard" class="btn">Мій профіль</a>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+</body>
+</html>

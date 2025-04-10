@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профіль користувача</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Профіль користувача</h1>
+        
+        <div class="profile-header">
+            <h2><%= user.username %></h2>
+            <% if (isOwnProfile) { %>
+                <span class="badge">Це ваш профіль</span>
+            <% } %>
+            <div class="avg-rating">
+                <span>Середній рейтинг: <%= avgRating %> / 5</span>
+            </div>
+        </div>
+        
+        <div class="ratings-section">
+            <h3>Відгуки (<%= ratings.length %>)</h3>
+            
+            <% if (ratings.length === 0) { %>
+                <p>Немає відгуків для цього користувача.</p>
+            <% } else { %>
+                <div class="ratings-list">
+                    <% ratings.forEach(function(rating) { %>
+                        <div class="rating-item">
+                            <div class="rating-header">
+                                <span class="rating-value">Оцінка: <%= rating.rating %>/5</span>
+                                <span class="rating-author">від <%= rating.rated_by %></span>
+                                <span class="rating-date"><%= new Date(rating.created_at).toLocaleDateString() %></span>
+                            </div>
+                            <div class="rating-comment">
+                                <% if (rating.comment) { %>
+                                    <%= rating.comment %>
+                                <% } else { %>
+                                    <em>Без коментаря</em>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } %>
+        </div>
+        
+        <!-- Update the navigation section -->
+        <div class="navigation">
+            <% if (!isOwnProfile) { %>
+                <a href="/rate/<%= user.id %>" class="btn">Оцінити користувача</a>
+дод            <% } %>
+            <a href="/dashboard" class="btn">Мій профіль</a>
+            <a href="/teachers" class="btn">Оцінювати</a>
+            <!-- Removed "Всі користувачі" button -->
+            <% if (user && user.isAdmin) { %>
+                <a href="/admin" class="btn admin-btn">Адмін-панель</a>
+            <% } %>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оцінку відправлено</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .success-message {
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .rating-summary {
+            background-color: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        
+        .rating-details {
+            margin: 15px 0;
+        }
+        
+        .rating-value {
+            font-size: 1.2em;
+            color: #e67e22;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-message">
+            <h1>Оцінку успішно відправлено!</h1>
+            <p>Дякуємо за ваш відгук.</p>
+        </div>
+        
+        <div class="rating-summary">
+            <h2>Інформація про оцінку</h2>
+            <div class="rating-details">
+                <p><strong>Вчитель:</strong> <%= teacher.full_name %></p>
+                <p><strong>Предмет:</strong> <%= teacher.subject %></p>
+                <p><strong>Ваша оцінка:</strong> <span class="rating-value"><%= rating %>/10</span></p>
+                <% if (comment) { %>
+                    <p><strong>Ваш коментар:</strong></p>
+                    <p><%= comment %></p>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="/teachers/<%= teacher.id %>" class="btn">Переглянути профіль вчителя</a>
+            <a href="/teachers" class="btn">Список вчителів</a>
+            <a href="/dashboard" class="btn">Мій профіль</a>
+            <% if (user && user.isAdmin) { %>
+                <a href="/admin" class="btn admin-btn">Адмін-панель</a>
+            <% } %>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+</body>
+</html>
