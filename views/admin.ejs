@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Адмін-панель</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Адмін-панель</h1>
+        
+        <div class="admin-panel">
+            <h3>Керування користувачами</h3>
+            
+            <% if (error) { %>
+                <div class="error"><%= error %></div>
+            <% } %>
+            
+            <div class="users-list">
+                <% if (users.length === 0) { %>
+                    <p>Немає користувачів у системі.</p>
+                <% } else { %>
+                    <% users.forEach(function(u) { %>
+                        <div class="user-row">
+                            <div class="user-info">
+                                <%= u.username %>
+                                <% if (u.is_admin === 1) { %>
+                                    <span class="admin-badge">Адмін</span>
+                                <% } %>
+                            </div>
+                            <div class="user-actions">
+                                <% if (u.id != user.id) { %>
+                                    <a href="/admin/toggle-admin/<%= u.id %>" class="btn btn-small admin-btn">
+                                        <%= u.is_admin === 1 ? 'Забрати права адміна' : 'Зробити адміном' %>
+                                    </a>
+                                    <a href="/admin/delete-user/<%= u.id %>" class="btn btn-small delete-btn" 
+                                       onclick="return confirm('Ви впевнені, що хочете видалити цього користувача?')">
+                                        Видалити
+                                    </a>
+                                <% } else { %>
+                                    <span>Поточний користувач</span>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="/dashboard" class="btn">Мій профіль</a>
+            <a href="/admin/students" class="btn admin-btn">Керування студентами</a>
+            <a href="/admin/teachers" class="btn admin-btn">Керування вчителями</a>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+</body>
+</html>

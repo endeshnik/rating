@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Чат</h1>
+        
+        <div class="chat-container">
+            <div class="chat-sidebar">
+                <h3>Користувачі</h3>
+                <div class="users-list">
+                    <% if (users.length === 0) { %>
+                        <p>Немає доступних користувачів.</p>
+                    <% } else { %>
+                        <% users.forEach(function(chatUser) { %>
+                            <a href="/chat/<%= chatUser.id %>" class="user-item <%= selectedUser && selectedUser.id === chatUser.id ? 'active' : '' %>">
+                                <%= chatUser.full_name %>
+                                <span class="unread-badge" id="unread-<%= chatUser.id %>"></span>
+                            </a>
+                        <% }); %>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div class="chat-main">
+                <% if (!selectedUser) { %>
+                    <div class="chat-welcome">
+                        <h2>Виберіть користувача для початку чату</h2>
+                        <p>Оберіть користувача зі списку зліва, щоб почати спілкування.</p>
+                    </div>
+                <% } else { %>
+                    <div class="chat-header">
+                        <h2>Чат з <%= selectedUser.full_name %></h2>
+                    </div>
+                    
+                    <div class="chat-messages" id="chat-messages">
+                        <% if (messages.length === 0) { %>
+                            <div class="no-messages">
+                                <p>Немає повідомлень. Почніть розмову!</p>
+                            </div>
+                        <% } else { %>
+                            <% messages.forEach(function(message) { %>
+                                <div class="message <%= message.sender_id === user.id ? 'outgoing' : 'incoming' %>">
+                                    <div class="message-content">
+                                        <%= message.message %>
+                                    </div>
+                                    <div class="message-time">
+                                        <%= new Date(message.created_at).toLocaleTimeString() %>
+                                    </div>
+                                </div>
+                            <% }); %>
+                        <% } %>
+                    </div>
+                    
+                    <div class="chat-input">
+                        <form action="/chat/send" method="POST" id="message-form">
+                            <input type="hidden" name="receiverId" value="<%= selectedUser.id %>">
+                            <div class="form-group">
+                                <input type="text" id="message" name="message" placeholder="Введіть повідомлення..." required>
+                                <button type="submit" class="btn send-btn">Відправити</button>
+                            </div>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+        
+        <div class="navigation">
+            <a href="/teachers" class="btn">Оцінювати</a>
+            <a href="/dashboard" class="btn">Мій профіль</a>
+            <% if (user && user.isAdmin) { %>
+                <a href="/admin" class="btn admin-btn">Адмін-панель</a>
+            <% } %>
+            <a href="/logout" class="btn logout-btn">Вийти</a>
+        </div>
+    </div>
+    
+    <script>
+        // Функція для оновлення чату
+        function updateChat() {
+            const selectedUserId = '<%= selectedUser ? selectedUser.id : "" %>';
+            if (!selectedUserId) return;
+            
+            fetch(`/chat/api/messages/${selectedUserId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const chatMessages = document.getElementById('chat-messages');
+                        let messagesHTML = '';
+                        
+                        if (data.messages.length === 0) {
+                            messagesHTML = '<div class="no-messages"><p>Немає повідомлень. Почніть розмову!</p></div>';
+                        } else {
+                            data.messages.forEach(message => {
+                                const isOutgoing = message.sender_id === <%= user.id %>,;
+                                const messageClass = isOutgoing ? 'outgoing' : 'incoming';
+                                const messageTime = new Date(message.created_at).toLocaleTimeString();
+                                
+                                messagesHTML += `
+                                    <div class="message ${messageClass}">
+                                        <div class="message-content">
+                                            ${message.message}
+                                        </div>
+                                        <div class="message-time">
+                                            ${messageTime}
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                        }
+                        
+                        chatMessages.innerHTML = messagesHTML;
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                })
+                .catch(error => console.error('Error updating chat:', error));
+        }
+        
+        // Функція для оновлення кількості непрочитаних повідомлень
+        function updateUnreadCounts() {
+            fetch('/chat/api/unread')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Оновити кількість непрочитаних повідомлень для кожного користувача
+                        // Це спрощена версія, яка просто показує загальну кількість
+                        const unreadBadges = document.querySelectorAll('.unread-badge');
+                        unreadBadges.forEach(badge => {
+                            badge.textContent = '';
+                        });
+                        
+                        if (data.count > 0) {
+                            // Тут можна додати логіку для показу кількості непрочитаних повідомлень для конкретних користувачів
+                        }
+                    }
+                })
+                .catch(error => console.error('Error updating unread counts:', error));
+        }
+        
+        // Оновлювати чат кожні 5 секунд
+        setInterval(updateChat, 5000);
+        
+        // Оновлювати кількість непрочитаних повідомлень кожні 10 секунд
+        setInterval(updateUnreadCounts, 10000);
+        
+        // Прокрутити чат вниз при завантаженні сторінки
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatMessages = document.getElementById('chat-messages');
+            if (chatMessages) {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Обробник форми для відправки повідомлень без перезавантаження сторінки
+            const messageForm = document.getElementById('message-form');
+            if (messageForm) {
+                messageForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const messageInput = document.getElementById('message');
+                    const receiverId = this.elements.receiverId.value;
+                    const message = messageInput.value.trim();
+                    
+                    if (message) {
+                        fetch('/chat/send', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                            },
+                            body: `receiverId=${receiverId}&message=${encodeURIComponent(message)}`
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                messageInput.value = '';
+                                updateChat();
+                            }
+                        })
+                        .catch(error => console.error('Error sending message:', error));
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
